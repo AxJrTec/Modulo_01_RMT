@@ -110,8 +110,8 @@ for idx = 2:numel(tVec)
     pose(:,idx) = curPose + vel*sampleTime; 
     
     % Update visualization
-    if mod(idx,15)==0
+    %if mod(idx,15)==0
         viz(pose(:,idx),waypoints,ranges)
-    end
-    %waitfor(r);
+    %end
+    waitfor(r);
 end
