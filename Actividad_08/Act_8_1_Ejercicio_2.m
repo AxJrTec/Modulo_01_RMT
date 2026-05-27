@@ -13,10 +13,10 @@ dd = DifferentialDrive(R,L);
 
 % Sample time and time array
 sampleTime = 0.1;              % Sample time [s]
-tVec = 0:sampleTime:163;        % Time array
+tVec = 0:sampleTime:12.8;        % Time array
 
 % Initial conditions
-initPose = [12.5;9;0];            % Initial pose (x y theta)
+initPose = [2;2;0];            % Initial pose (x y theta)
 pose = zeros(3,numel(tVec));   % Pose matrix
 pose(:,1) = initPose;
 
@@ -34,7 +34,7 @@ load exampleMap
 lidar = LidarSensor;
 lidar.sensorOffset = [0,0];
 lidar.scanAngles = linspace(-pi,pi,200);%51
-lidar.maxRange = 0.6;%5
+lidar.maxRange = 0.5;%5
 
 % Create visualizer
 viz = Visualizer2D;
@@ -47,14 +47,18 @@ attachLidarSensor(viz,lidar);
 % Create waypoints
 waypoints = [initPose(1:2)'
              2 6;
-             4 8];
+             4 8
+             9 8
+             7 6
+             9 3
+             7 2];
 
 % Pure Pursuit Controller
 controller = controllerPurePursuit;
 controller.Waypoints = waypoints;
-controller.LookaheadDistance = 0.15;
-controller.DesiredLinearVelocity = 0.75; 
-controller.MaxAngularVelocity = 6.5;
+controller.LookaheadDistance = 0.25;
+controller.DesiredLinearVelocity = 1.7; 
+controller.MaxAngularVelocity = 11.5;
 
 % Vector Field Histogram (VFH) for obstacle avoidance
 vfh = controllerVFH;
