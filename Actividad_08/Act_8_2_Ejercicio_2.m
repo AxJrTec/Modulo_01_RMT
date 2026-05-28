@@ -12,11 +12,11 @@ L = 0.5;                        % Wheelbase [m]
 dd = DifferentialDrive(R,L);
 
 % Sample time and time array
-sampleTime = 0.1;              % Sample time [s]
-tVec = 0:sampleTime:160;        % Time array
+sampleTime = 0.05;              % Sample time [s]
+tVec = 0:sampleTime:100;        % Time array
 
 % Initial conditions
-initPose = [11;19;0];            % Initial pose (x y theta)
+initPose = [7;2;0];            % Initial pose (x y theta)
 pose = zeros(3,numel(tVec));   % Pose matrix
 pose(:,1) = initPose;
 
@@ -29,13 +29,13 @@ pose(:,1) = initPose;
 %ternaryMap      501x501            2008008  double  
 
 close all
-load complexMap
+load complexmap
 
 % Create lidar sensor
 lidar = LidarSensor;
 lidar.sensorOffset = [0,0];
-lidar.scanAngles = linspace(-pi,pi,200);%51
-lidar.maxRange = 2;%5
+lidar.scanAngles = linspace(-pi, pi, 360); % -pi a pi es un círculo completo (360 rayos)
+lidar.maxRange = 1;%5
 
 % Create visualizer
 viz = Visualizer2D;
@@ -46,38 +46,86 @@ attachLidarSensor(viz,lidar);
 %% Path planning and following
 
 % Create waypoints
-waypoints = [initPose(9:2)'; 
-            11 19
-            14 16;
-            20 14;
-            21 13;
-            20 14;
-            12 14;
-            4 14;
-            1 10;
-            6 9;
-            9 4
-            15 4
-            20 4;
-            23 3;
-            ];
+initPose = [7;2;0];
+waypoints = [
+
+% ===== P1: INICIO =====
+7 2;
+
+% ===== SUBIDA BLOQUE IZQUIERDO =====
+7 4;
+7 6;
+7 8;
+
+5 8;
+3 8;
+
+1.5 10;
+1.5 12;
+1.5 14;
+5 14;
+8 14;
+8 16;
+
+% ===== P2 =====
+3 18;
+
+% ===== RECORRIDO SUPERIOR =====
+5 18;
+7 18;
+9 14;
+11 14;
+13 14;
+
+15 14;
+16 15;
+17 19.1;
+17.5 19.1;
+18 19.1;
+18.5 19.1;
+19 19.1;
+19.5 19.1;
+20 19.1;
+20.5 19.1;
+21 19.1;
+21.5 19.1;
+22 18;
+
+% ===== P3 =====
+22 17;
+
+% ===== BAJADA BLOQUE DERECHO =====
+24.5 15;
+24 13;
+24 11;
+24 9;
+19.5 8.5;
+16.5 8.5;
+16 6;
+16.5 4.5
+18.5 4.5
+21.5 4.5
 
 
+
+% ===== P4 =====
+24 1
+];
 % Pure Pursuit Controller
 controller = controllerPurePursuit;
 controller.Waypoints = waypoints;
-controller.LookaheadDistance = 0.4;%0.5
-controller.DesiredLinearVelocity = 0.6; %0.75
-controller.MaxAngularVelocity = 10 ; 
+controller.LookaheadDistance = 0.5;%0.5
+controller.DesiredLinearVelocity = 1.5; %0.75
+controller.MaxAngularVelocity = 3;
 
 % Vector Field Histogram (VFH) for obstacle avoidance
 vfh = controllerVFH;
-vfh.DistanceLimits = [0.05 2.5]; %0.05 3
-vfh.NumAngularSectors = 36; %36
-vfh.HistogramThresholds = [3 8]; % 5y 10
+vfh.DistanceLimits = [0.01 1]; %0.05 3
+vfh.NumAngularSectors = 100; %36
+vfh.HistogramThresholds = [5 10]; % 5y 10
 vfh.RobotRadius = L;
-vfh.SafetyDistance = 0.15;
-vfh.MinTurningRadius = 0.05;%0.25
+vfh.SafetyDistance = L;
+vfh.MinTurningRadius = 0.1;%0.25
 
 %% Simulation loop
 r = rateControl(1/sampleTime);
@@ -103,6 +151,9 @@ for idx = 2:numel(tVec)
     pose(:,idx) = curPose + vel*sampleTime; 
     
     % Update visualization
-    viz(pose(:,idx),waypoints,ranges)
+    % Actualizar visualización solo cada 20 iteraciones para acelerar la animación
+    %if mod(idx, 20) == 0
+        viz(pose(:,idx), waypoints, ranges)
+    %end
     waitfor(r);
 end
