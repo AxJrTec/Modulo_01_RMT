@@ -4,7 +4,7 @@ close all
 clc
 
 %1 TIEMPO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tf=358;             % Tiempo de simulación en segundos (s)
+tf=80;             % Tiempo de simulación en segundos (s)
 ts=0.1;            % Tiempo de muestreo en segundos (s)
 t=0:ts:tf;         % Vector de tiempo
 N= length(t);      % Muestras
